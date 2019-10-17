@@ -132,9 +132,11 @@ class GameState:
 
             if len(plyr.stack) > 0:
                 tpop = plyr.stack.pop()
-                
+            
                 # Insert back into tile line
-                if tpop > self.tile_line[-1]:
+                if len(self.tile_line) == 0:
+                    self.tile_line.append(tpop)    
+                elif tpop > self.tile_line[-1]:
                     self.tile_line.append(tpop)
                 elif tpop < self.tile_line[0]:
                     self.tile_line.insert(0, tpop)
@@ -264,6 +266,10 @@ class GameState:
                                 tgrab.tile_value = self.TILES[tid]
                                 tgrab.from_tile_line = True
                                 moves.append((Move.STOP, dbank, tgrab))
+            if moves == []:
+                # Player can take the remaining dice but it does not 
+                # give a total that allows them to take a tile.
+                moves = [(Move.BUST, None, None)]
 
         assert(len(moves) >= 1)
         return moves
@@ -289,6 +295,15 @@ class GameRunner:
 
         self.game_state = GameState(len(player_list))
         self.players = player_list
+    
+        assert(len(player_list) <= 7)
+        assert(len(player_list) > 1)
+
+        # Player id's must be unique and increasing from 0 
+        i = 0
+        for plr in player_list:
+            assert(plr.id == i)
+            i += 1
 
         # randomly assign first player
         fp = random.randrange(len(player_list))
@@ -337,8 +352,10 @@ class GameRunner:
                         selected = moves[0]
                     else:
                         gs_copy = copy.deepcopy(self.game_state)
-                        selected = self.players[i].SelectMove(roll,
-                            moves, gs_copy)
+                        moves_copy = copy.deepcopy(moves)
+                        roll_copy = roll[:]
+                        selected = self.players[i].SelectMove(roll_copy,
+                            moves_copy, gs_copy)
 
                         if log_state:
                             print("\nPlayer {} has chosen the following" \

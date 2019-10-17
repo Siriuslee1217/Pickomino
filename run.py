@@ -15,17 +15,13 @@
 #
 from model import GameRunner,Player
 from iplayer import InteractivePlayer
+from naive_player import NaivePlayer
 
 
-players = [InteractivePlayer(0), Player(1), InteractivePlayer(2)]
+players = [InteractivePlayer(0), NaivePlayer(1), NaivePlayer(2)]
 
-# Player id's must be unique and increasing from 0 
-i = 0
-for plr in players:
-    assert(plr.id == i)
-    i += 1
 
-gr = GameRunner(players, 457846578367)
+gr = GameRunner(players, 54298758156784)
 
 scores = gr.Run(True)
 
